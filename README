@@ -1,0 +1,3 @@
+A image processing lib, based on opencv
+Functions:
+0.  detect the mask face
