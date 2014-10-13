@@ -20,16 +20,20 @@ using namespace std;
 
 void SVMTrain(Image* image_ptr, int nfiles){
 	float labels[_MAX_NUM];
-	double labelsMat[_MAX_NUM][2];
+	double trainingData[_MAX_NUM][2];
 
 	for(int i = 0; i<nfiles; i++){
 		printf("Source:%s\t\t%f\t\t%s\t\t%f\n", image_ptr->nir_file_name, image_ptr->nir_norm_mean,image_ptr->visible_file_name, image_ptr->visible_norm_mean, image_ptr->value);
 		
 		//set up training data
 		labels[i] = image_ptr->value;
-		labelsMat[i][0] = image_ptr->nir_norm_mean ;
-		labelsMat[i][1] = image_ptr->visible_norm_mean ;
+		trainingData[i][0] = image_ptr->nir_norm_mean ;
+		trainingData[i][1] = image_ptr->visible_norm_mean ;
 	}
+
+	Mat trainingDataMat(nfiles, 2, CV_32FC1, trainingData);
+	//
+	Mat labelsMat(nfiles, 1, CV_32FC1, labels );
 
 	//for(int i = 0; i<nfiles; i++){
 	//	printf("Source:%s\t\t%f\t\t%f\t\t%f\n", image_ptr->nir_file_name, labelsMat[i][0],labelsMat[i][1],labels[i] = image_ptr->value);
@@ -40,8 +44,8 @@ void SVMTrain(Image* image_ptr, int nfiles){
 	//	labelsMat[i][1] = image_ptr->visible_norm_mean ;
 	//}
 
-	//Mat 
-	Mat labelsMat(nfiles, 1, CV_8U, labels );
+	
+
 	// set up svm's parameters
 	CvSVMParams params;
 	params.svm_type = CvSVM::C_SVC;
@@ -49,9 +53,25 @@ void SVMTrain(Image* image_ptr, int nfiles){
 	params.term_crit = cvTermCriteria(CV_TERMCRIT_ITER, 100, 1e-6);
 
 	////Train the SVM
-	//CvSVM SVM;
-
+	CvSVM SVM;
+	SVM.train(trainingDataMat,labelsMat, Mat(), Mat(), params);
 	 
+	Vec3b green(0,255,0), blue(255,0,0);
+	//the decision regions from svm
+	for(int i = 0; i < nfiles; ++i){
+		for(int j = 0; j < nfiles; ++j){
+			Mat sampleMat = ((Mat_<float>(1,2)) <<j,i);
+			float response = SVM.predict(sampleMat);
+
+			if(response == 1){
+			    //mask
+
+			} else if (response == 0) {
+
+			}
+     
+		}
+	}
 	
 }
 
@@ -93,6 +113,7 @@ void NormalizeAll(Image* image_ptr, int nfiles, double nir_max, double visible_m
 	for(i = 0; i < nfiles; i++){
 		image_ptr->nir_norm_mean = Normalize(image_ptr->nir_norm_mean, nir_max);
 		image_ptr->visible_norm_mean = Normalize(image_ptr->visible_norm_mean, visible_max);
+
 		image_ptr++;
 	}
 }
