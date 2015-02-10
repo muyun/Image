@@ -6,6 +6,13 @@
 // The PCA finds a linear combination of features that maximizes the total variance in data;
 // It doesn't consider any classes and so a lot of discriminative information may be lost when throwing components away.
 //
+// TODO:
+//      1. Generalization
+//            - save the model of each subject
+//            - use the trained model to test the test dataset
+//
+//      2. Calculate verification rate and false accept rate
+//
 #include "stdafx.h"
 #include "eigenfaces.h"
 
@@ -18,11 +25,26 @@ using namespace std;
 //namespace fs = boost::filesystem;
 
 // dataset in each subject
-const int SUBJECT_DATA = 12;
+const int SUBJECT_DATASET = 12;
+
+// size of the training dataset
+const int TRAINING_DATASET = 6;
+// test dataset
+const int TEST_DATASET = 6;
+
+// feature num
+//The number of components(read: Eigenfaces) kept for this Prinicpal Component Analysis.
+//As a hint : There¡¯s no rule how many components(read : Eigenfaces) should be kept for good reconstruction capabilities.
+//It is based on your input data, so experiment with the number.
+//Keeping 80 components should almost always be sufficient.
+const int FEATURE_NUM = 80;
+
+// threshold
+double THRESHOLD = 0.5;
 
 
 //Preparing the data
-//These two functions are from Face Recognition src in OpenCV doc
+//The function is from Face Recognition src in OpenCV doc
 static Mat norm_0_255(InputArray _src) {
 	Mat src = _src.getMat();
 	// Create and return normalized image:
@@ -61,7 +83,7 @@ static vector<string> split(const char *str, char c = '\\' )
 
 static string get_dir(const string& filename, const string& outpath)
 {
-	//TODO: using the Boost for this function
+	//TODO: using the Boost lib for this function
 	/*
 	//int length = path.length();
 	//boost::regex replaceRegex("\\\\");
@@ -123,13 +145,24 @@ static void read_csv_(const string& filename, vector<Mat>& images, vector<int>& 
 			}
 			*/
 
+			//The labels corresponding to the images
 			labels.push_back(atoi(classlabel.c_str()));
 		}
 	}
 
 }
 
-static void get_result(vector<Mat>& images, vector<int>& labels, const string& output_folder)
+static int write_file(const string& output_folder, const string& str)
+{
+	ofstream file;
+	file.open(output_folder + "rate.txt");
+	
+	file << str << endl;
+
+	file.close();
+}
+
+static string get_result(ofstream& logstream, vector<Mat>& images, vector<int>& labels, const string& output_folder)
 {
     // quit if there are not enough images (at least 2 images to work)
 	if (images.size() <= 1)
@@ -141,35 +174,90 @@ static void get_result(vector<Mat>& images, vector<int>& labels, const string& o
 	// get the height from the first image for the output
 	int height = images[0].rows;
 
-	// For eigen and fisherfaces, the images have to flatten it to one row; the lbp one doesn't
-	for (int index = 0; index < images.size(); ++index)
-		images[index] = images[index].reshape(1, 1);
-
+	/*
 	// the last image in each dataset is the test data
 	Mat testSample = images[images.size() - 1];
 	int testLabel = labels[labels.size() - 1];
 	images.pop_back();
 	labels.pop_back();
+	*/
 
-	// create an Eigenfaces model for face recognition and train it with the images and labels
+	vector<Mat> trainingSamples, testSamples;
+	vector<int> trainingLabels, testLabels;
+
+	for (int i = 0; i < images.size(); ++i)
+	{
+		//THE EIGENFACES METHOD MAKES THE ASSUMPTION, THAT THE TRAINING AND TEST IMAGES ARE OF EQUAL SIZE
+		// For eigen and fisherfaces, the images have to flatten it to one row; the lbp one doesn't
+        //images[i] = images[i].reshape(1, 1);
+
+		// the traing dataset
+		if (i < TRAINING_DATASET)
+		{
+			trainingSamples.push_back(images[i].reshape(1, 1));
+			trainingLabels.push_back(labels[i]);
+		}
+
+		// the test dataset
+		if (i >= TEST_DATASET)
+		{
+			testSamples.push_back(images[i].reshape(1,1));
+			testLabels.push_back(labels[i]);
+		}
+
+	}
+
+	/*  -----   train the model	 ----- */
+
+    // create an Eigenfaces model for face recognition and train it with the images and labels
 	// class FaceRecognizer : Algorithm
-	// TODO: the FaceRecognizer class, and the derived classes 
-	Ptr<FaceRecognizer> model = createEigenFaceRecognizer();
-	model->train(images, labels);
+	// TODO: the FaceRecognizer class, and the derived classes
+	//
+	// The features num
+	//The number of components (read: Eigenfaces) kept for this Prinicpal Component Analysis
+	//int FEATURE_NUM = 10;
+	// The threshold applied in the prediction. 
+	// If the distance to the nearest neighbor is larger than the threshold, this method returns -1
+	//double threshold = 10.0;
+	Ptr<FaceRecognizer> model = createEigenFaceRecognizer(FEATURE_NUM, THRESHOLD);
 
-	// predicts the label of a given test image
-	//int predictedLabel = 0;
-	//double confidence = 0.0;
-	//model->predict(testSample, predictedLabel, confidence);
-	int predictedLabel = model->predict(testSample);
+	model->train(trainingSamples, trainingLabels);
 
-	// the confidence
-	string result_message = format("Predicted class = %d / Actual class = %d .", predictedLabel, testLabel);
-	cout << result_message << endl;
+    /*  -----   test the model	 ----- */
+	int num = 0;
+	// test each image
+	for (int i = 0; i < testSamples.size(); ++i)
+	{
+		// predicts the label of a given test image;
+		// -1 as label, which indicates this face is unknown
+		int predictedLabel = -1;
+		// Associated confidence (e.g. distance) for the predicted label.
+		double confidence = 0.0;
+		model->predict(testSamples[i], predictedLabel, confidence);
+		//int predictedLabel = model->predict(testSample);
 
-	// get the eigenvalues of this Eigenfaces model
+		// the confidence
+		string result_message = format("Predicted class = %d / Actual class = %d .", predictedLabel, testLabels[i]);
+		cout << result_message << endl;
+		logstream << result_message << endl;
+
+		if ( predictedLabel == testLabels[i])
+		{
+			num++;
+		}
+
+   }
+
+	double confidence_rate = num / (double)TEST_DATASET;
+	string confidence_rate_message = format("%.2f", confidence_rate);
+	cout << confidence_rate_message << endl;
+	logstream << confidence_rate_message << endl;
+
+	/*  -----   display the result	 ----- */
+
+	// get the eigenvalues of this Eigenfaces model	in ordered descending
 	Mat eigenvalues = model->getMat("eigenvalues");
-	// the Eigenvectors
+	// the eigenvectors ordered by the eigenvalues
 	Mat W = model->getMat("eigenvectors");
 	// the sample mean from the training data
 	Mat mean = model->getMat("mean");
@@ -187,6 +275,7 @@ static void get_result(vector<Mat>& images, vector<int>& labels, const string& o
 	{
 		string msg = format("Eigenvalue #%d = %.5f", i, eigenvalues.at<double>(i));
 		cout << msg << endl;
+		logstream << msg << endl;
 
 		// get eigenvector #i
 		Mat ev = W.col(i).clone();
@@ -207,17 +296,33 @@ static void get_result(vector<Mat>& images, vector<int>& labels, const string& o
 		//}
 	}
 
+
+	// write the file
+	//ofstream file;
+	//file.open(output_folder + "rate.txt");
+	string write_content = to_string(testLabels[0]) + ":" + confidence_rate_message;
+	//file << write_content << endl;
+	//file.close();
+
+	return write_content;
 }
 
-
-static void read_csv(const string& filename, const string& output_folder, char separator = ';') {
+/* 
+   read_csv - 
+            - Load the dataset
+*/
+static void read_csv(ofstream& logstream, const string& filename, const string& output_folder, char separator = ';') {
 	std::ifstream file(filename.c_str(), ifstream::in);
 	if (!file) {
 		string error_message = "No valid input file was given, please check the given filename.";
 		CV_Error(CV_StsBadArg, error_message);
 	}
 
-	// The vectors hold the images and corresponding labels based on the csv format
+	// open the file
+	ofstream fstream;
+	fstream.open(output_folder + "rate.txt");
+
+    // The vectors hold the images and corresponding labels based on the csv format
 	vector<Mat> images;
 	vector<int> labels;
 	//store the subjects
@@ -226,7 +331,7 @@ static void read_csv(const string& filename, const string& output_folder, char s
 	
 	int num = 1;
 	//the index of subject
-	int index = 1;
+	int index = 0;
 
 	string line, path, classlabel;
 	while (getline(file, line)) {
@@ -256,25 +361,28 @@ static void read_csv(const string& filename, const string& output_folder, char s
 			labels.push_back(atoi(classlabel.c_str()));
 
 			// for each subject
-			if ((num % SUBJECT_DATA) == 0)
+			if ((num % SUBJECT_DATASET) == 0)
 			{
 				//mat_matrix.push_back(images);
 				//label_matrix.push_back(labels);
 
 				cout << "For the subject num: " << index << endl;
-				
+				logstream << "For the subject num: " + to_string(index) << endl;
+
 				//mkdir 
 				string dir = get_dir(path, output_folder);
 				_mkdir(dir.c_str());
 
 				// get the calculation results 
-				get_result(images, labels, dir);
+				string str = get_result(logstream, images, labels, dir);
 
+				fstream << str << endl;
 				//
 				images.clear();
 				labels.clear();
 
-				cout << "-----------------------------"<< endl;
+				cout << "-----------------------------" << endl;
+				logstream << "-----------------------------"  << endl;
 
 				//next suject
 				index++;
@@ -295,6 +403,7 @@ static void read_csv(const string& filename, const string& output_folder, char s
 	}
 	*/
 
+	fstream.close();
 }
 
 int main(int argc, const char* argv[])
@@ -323,6 +432,10 @@ int main(int argc, const char* argv[])
 	// get the path to the csv
 	string fn_csv = string(argv[1]);
 
+	//open the log file
+	ofstream logstream;
+	logstream.open(output_folder + "log.txt");
+
 	// The vectors hold the images and corresponding labels based on the csv format
 	//vector<Mat> images;
 	//store the subjects
@@ -331,7 +444,7 @@ int main(int argc, const char* argv[])
 	
 	// read the csv file
 	try {
-		read_csv(fn_csv, output_folder);
+		read_csv(logstream, fn_csv, output_folder);
 
 	} catch (cv::Exception& e){
 		cerr << "Error opening file \"" << fn_csv << "\". Reason: " << e.msg << endl;
@@ -343,6 +456,9 @@ int main(int argc, const char* argv[])
 	//{
 		waitKey(0);
 	//}
+
+
+	logstream.close();
 
 	return 0;
 }
