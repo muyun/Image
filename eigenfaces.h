@@ -8,16 +8,42 @@
 // highgui - an easy-to-use interface to video capturing, image and video codecs, as well as simple UI capabilities
 #include "opencv2/highgui/highgui.hpp"
 
-//#include <boost/regex.hpp>
-//#include <boost/filesystem.hpp>
+// -- Main Global Parameters here
+// the sample number for each subject
+const int NUM_SUBJECT_DATASET = 12;
+// holds the num of subject
+const int SELECTED_SUBJECTS = 40;
+// size of the training dataset
+const int TRAINING_DATASET = 6;
+// size of the test dataset
+const int TEST_DATASET = 6;
+//
+//The number of components(read: Eigenfaces) kept for this Prinicpal Component Analysis.
+//As a hint : There¡¯s no rule how many components(read : Eigenfaces) should be kept for good reconstruction capabilities.
+//It is based on your input data, so experiment with the number.
+//Keeping 80 components should almost always be sufficient.
+const int NUM_COMPONENTS = 20;
+// threshold
+const double THRESHOLD = 0.5;
 
-#include <iostream>
-// iostream <-- fstream
-// fstream - read and write from/to files
-#include <fstream>
-// sstream - provides templates and types that enable interoperation between stream buffers and string objects
-#include <sstream>
+// -- Main struct definitions
+using namespace cv;
+using namespace std;
+// namespace fs = boost::filesystem;
 
-#include <direct.h>
+//typedef vector<vector<Mat> > MatMatrix ;
+//typedef vector<vector<int> > IntMatrix ;
 
-#endif
+Mat norm_0_255(InputArray _src);
+
+vector<string> split(const char *str, char c );
+
+string get_dir(const string& filename, const string& outpath);
+
+void write_file(const string& output_folder, const string& str);
+
+void read_csv(vector<Mat>& trainingSamples, vector<int>& trainingLabels, vector<Mat>& testSamples, vector<int>& testLabels, ofstream& logstream, const string& filename, int& height, char separator);
+
+int get_result(vector<Mat>& trainingSamples, vector<int>& trainingLabels, vector<Mat>& testSamples, vector<int>& testLabels, ofstream& logstream, int height, const string& output_folder);
+
+#endif	/*EIGENFACES_H*/
