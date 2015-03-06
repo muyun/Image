@@ -69,7 +69,7 @@
                 static_cast<int>(std::pow(2.0, static_cast<double>(_neighbors))), /* number of possible patterns */
                 _grid_x, /* grid size x */
                 _grid_y, /* grid size y */
-                true) ]
+                true) 
                
               The parameters *gird_x* and *grid_y* control the grid size of the spatial histograms.
               At last the feature vectors (p here is the spatial histogram) are given .
