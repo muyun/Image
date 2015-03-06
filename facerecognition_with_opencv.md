@@ -21,19 +21,20 @@
 
           - The [API] [3] in OpenCV:
           Ptr<FaceRecognizer> createEigenFaceRecognizer(int num_components, double threshold)
-            [~\sources\modules\contrib\src\facerec.cpp]
+            (~\sources\modules\contrib\src\facerec.cpp)
           ----------------------------------------------------------------------------------------------------------------
-                > Perform the PCA
-                [ pca(data, Mat(), CV_PCA_DATA_AS_ROW, _num_components) (~\modules\core\src\matmul.cpp) ]
+                + Perform the PCA
+                (~\modules\core\src\matmul.cpp)
+                pca(data, Mat(), CV_PCA_DATA_AS_ROW, _num_components) 
 
                 The parameter *num_components* means that how many principal components to retain (it is not larger than
             the number of training samples) .
                   
-                > Get the feature vectors (y here is the principal component )
-                [ Mat y = subspaceProject(_eigenvectors, _mean, data.row(sampleIdx) ]
+                + Get the feature vectors (y here is the principal component )
+                 Mat y = subspaceProject(_eigenvectors, _mean, data.row(sampleIdx)
                 
-                The parameter *threshold* here gives a upper distance limit in the prediction (It is the parameter *minDist* in the
-            Eigenfaces::predict())
+                The parameter *threshold* here gives a upper distance limit in the prediction (It is the parameter
+            *minDist* in the  Eigenfaces::predict())
                 
 
            Eigenfaces::predict(InputArray _src, int &minClass, double &minDist)
@@ -54,27 +55,28 @@
 
           - The [API] [3] in OpenCV
           Ptr<FaceRecognizer> createLBPHFaceRecognizer(int radius,int neighbors, int grid_x, int grid_y, double threshold)
-          --------------------------------------------------------------------------------------------------------------            
-             > Calculate lbp image
-                [ elbp(src[sampleIdx],_radius,_neighbors) ]
+          --------------------------------------------------------------------------------------------------------------
+            + Calculate lbp image
+            
+              elbp(src[sampleIdx],_radius,_neighbors) 
              
-                The parameters *radius* and *neighbors* are used in the local binary pattern creation
+              The parameters *radius* and *neighbors* are used in the local binary pattern creation
                
-             > Get spatial histogram from this lbp image
-
-                [ Mat p = spatial_histogram(
+            + Get spatial histogram from this lbp image
+            
+              Mat p = spatial_histogram(
                 lbp_image, /* lbp_image */
                 static_cast<int>(std::pow(2.0, static_cast<double>(_neighbors))), /* number of possible patterns */
                 _grid_x, /* grid size x */
                 _grid_y, /* grid size y */
                 true) ]
                
-                The parameters *gird_x* and *grid_y* control the grid size of the spatial histograms.
-                At last the feature vectors (p here is the spatial histogram) are given .
+              The parameters *gird_x* and *grid_y* control the grid size of the spatial histograms.
+              At last the feature vectors (p here is the spatial histogram) are given .
 
           LBPH::predict(InputArray _src, int &minClass, double &minDist)
           ---------------------------------------------------------------------------------------------------------------
-              [ compareHist(_histograms[sampleIdx], query, CV_COMP_CHISQR) ]
+              compareHist(_histograms[sampleIdx], query, CV_COMP_CHISQR)
 
               Chi-square test is used for the distance measure
 			  
@@ -92,6 +94,6 @@
         
         
  [1]: http://docs.opencv.org/trunk/modules/contrib/doc/facerec/ "Face Recognition with OpenCV"
- [2]: http://en.wikipedia.org/wiki/Eigenface "Eigenface"
+ [2]: http://en.wikipedia.org/wiki/Eigenface/ "Eigenface"
  [3]: http://docs.opencv.org/trunk/modules/contrib/doc/facerec/facerec_api.htm "FaceRecognizer API"
  [4]: http://en.wikipedia.org/wiki/Receiver_operating_characteristic "ROC"
