@@ -1,5 +1,7 @@
 A image processing lib, based on opencv
+
 Functions:
+
 0.  database connection (mysql)
      - dbconnection*
      
