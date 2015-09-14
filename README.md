@@ -5,7 +5,7 @@ Functions:
 0.  database connection (mysql)
      - dbconnection*
      
-1.  detect the mask face
+1.  detect the mask face using SVM
      - masked_face_detection*
      
 2.  PCA and LBPH alg are used to face recognizion
