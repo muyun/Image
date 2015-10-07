@@ -10,3 +10,7 @@ Functions:
      
 2.  PCA and LBPH alg are used to face recognizion
      - eigenfaces*
+
+
+3.  Centroid-based partitioning (Hierarchical Clustering) and multi-probe LSH algorithm examples based on the FLANN library
+     - flann*
