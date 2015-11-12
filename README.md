@@ -14,3 +14,5 @@ Functions:
 
 3.  Centroid-based partitioning (Hierarchical Clustering) and multi-probe LSH algorithm examples based on the FLANN library
      - flann*
+
+4.   iris for the biometric
