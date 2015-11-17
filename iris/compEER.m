@@ -11,15 +11,17 @@ function [] = compEER()
 %
 
 %Read the data from the result - compare.txt
-name = 'E:\wenlong\documents\proj\iris\lamp\compare-lg.txt';
+name = 'E:\share\ZWL\1112\compare_cr_lamp.txt';
 nuser = 100 ; 
 nid = nuser * 2;  % 100 identities * (right eye + left eye)
 nsamp = 20; % 20 samples in each eye
 
 %ndis = nid * nsamp; % the dim
 %rest = zeros(nid, nsamp*2, ndis);
-sret = zeros(nid * nsamp * nsamp, 1);  % for the same identity
-dret = zeros(nid * (nid -1) * nsamp * nsamp, 1); % for the different identities
+%sret = zeros(nid * nsamp * nsamp, 1);  % for the same identity
+%dret = zeros(nid * (nid -1) * nsamp * nsamp, 1); % for the different identities
+sret = {};
+dret = {};
 
 fid = fopen(name, 'rt');
 
@@ -55,10 +57,10 @@ while feof(fid) == 0,
      
      if user1 == user2,  % the same identity
           sn =  sn + 1;
-          sret(sn) = dist;
+          sret{sn} = dist;
      else
          dn = dn + 1;
-         dret(dn) = dist;
+         dret{dn} = dist;
      end
      
       
@@ -106,7 +108,7 @@ while feof(fid) == 0,
 end
 
 % Equal Error Rate (EER) :  FAR = FRR
-[FARs, FRRs, thred, Te, er] = comp( sret, dret );
+[FARs, FRRs, thred] = comp( sret, dret );
 
 % plot
  figure(1); hold on;
@@ -120,7 +122,7 @@ line(thred, FARs*100,'LineWidth',2,'Color','b');
 line(thred, FRRs*100,'LineWidth',2,'Color','r');
 %text(thred, FRRs*100, 'FRR');
 
-plot(Te,er/2, 'g*'); % fla
+%plot(Te,er/2, 'g*'); % fla
 
 %hold on
 xlabel('Threshold Value, Ts', 'FontSize', 14);
@@ -132,20 +134,26 @@ set(h, 'FontSize', 10, 'position', [0.7, 0.12, 0.2, 0.2]);
 
 % Te  can be determined as the trade-off point
 % 
-function [FARs, FRRs, thred, Te, er] = comp( intra_dists, inter_dists )
-      a = min(intra_dists);
-      b = max(inter_dists);
+function [FARs, FRRs, thred, Te, er] = comp( sd, dd )
+     intra_dists=  cell2mat(sd);
+     inter_dists = cell2mat(dd);
+     a = min(intra_dists);
+     b = max(inter_dists);
+      
+     a = min(sd);
+      b = max(dd);
       dx = (b - a) / 100;
       
       thred = 0:dx:1;
       
+      Te = 0; 
       er=0; % Error Rate
       FARs = [];
       FRRs = [];
       
       for x=0:dx:1,
-              er1=length(intra_dists(intra_dists>x))/length(intra_dists);
-              er2=length(inter_dists(inter_dists<=x))/length(inter_dists);
+              er1=length(intra_dists(intra_dists<=x))/length(intra_dists);
+              er2=length(inter_dists(inter_dists>x))/length(inter_dists);
               
               FARs=[FARs er1];
               FRRs=[FRRs er2];
