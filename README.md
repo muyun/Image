@@ -1,4 +1,4 @@
-A biometric(image) processing lib, based on opencv
+A biometric (image) processing lib, based on opencv
 
 Functions:
 
