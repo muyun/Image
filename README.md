@@ -1,6 +1,6 @@
-An image processing lib, based on opencv
+###An image processing lib, based on opencv
 
-Functions:
+#### Functions:
 
 * database connection (mysql)
      - dbconnection*
@@ -17,3 +17,5 @@ Functions:
 
 * iris for the biometric
      - focus on the binary feature generation
+
+#### LICENSE
