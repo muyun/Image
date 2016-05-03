@@ -1,8 +1,8 @@
-###An image processing lib, based on opencv
+###An image processing (mainly on biometric) Lib, based on OpenCV
 
 #### Functions:
 
-* database connection (mysql)
+* database (Mysql) connection
      - dbconnection*
      
 * detect the mask face using SVM
