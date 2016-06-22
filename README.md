@@ -2,7 +2,7 @@
 
 #### Functions:
 
-* database (Mysql) connection
+* database connection
      - dbconnection*
      
 * detect the mask face using SVM
