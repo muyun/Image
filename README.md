@@ -1,4 +1,4 @@
-###An image processingLib, based on OpenCV
+###An image processing Lib
 
 #### Functions:
      
