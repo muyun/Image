@@ -1,9 +1,9 @@
-###An image processing (mainly on biometric) Lib, based on OpenCV
+###An image processingLib, based on OpenCV
 
 #### Functions:
      
-* detect the mask face using SVM
-     - masked_face_detection*
+* detect the  face using SVM
+     - m_face_detection*
      
 * PCA and LBPH alg are used to face recognizion
      - eigenfaces*
