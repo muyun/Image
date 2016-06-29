@@ -72,10 +72,10 @@ int Initialize(Image* image_ptr){
 	}
 
 	if(mysql_real_connect(conn, 
-		                  "mysql.comp.polyu.edu.hk", 
-						  "biomet", 
-						  "qwkdjmxn", 
-						  "biomet", 
+		                  "localhost", 
+						  "test", 
+						  "test", 
+						  "test", 
 						  3306, 
 						  NULL, 
 						  0) == NULL){
