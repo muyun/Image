@@ -1,9 +1,6 @@
 ###An image processing (mainly on biometric) Lib, based on OpenCV
 
 #### Functions:
-
-* database connection
-     - dbconnection*
      
 * detect the mask face using SVM
      - masked_face_detection*
