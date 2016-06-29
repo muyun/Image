@@ -1,8 +1,8 @@
-###An image processing lib, based on opencv
+###An image processing (mainly on biometric) Lib, based on OpenCV
 
 #### Functions:
 
-* database connection (mysql)
+* database connection
      - dbconnection*
      
 * detect the mask face using SVM
@@ -18,4 +18,5 @@
 * iris for the biometric (with [LICENSE](https://github.com/muyun/dev.imageprocessing/blob/master/iris/LICENSE.md))
      - focus on the binary feature generation
 
+* MIT-license
 

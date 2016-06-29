@@ -72,10 +72,10 @@ int Initialize(Image* image_ptr){
 	}
 
 	if(mysql_real_connect(conn, 
-		                  "mysql.comp.polyu.edu.hk", 
-						  "biomet", 
-						  "qwkdjmxn", 
-						  "biomet", 
+		                  "localhost", 
+						  "test", 
+						  "test", 
+						  "test", 
 						  3306, 
 						  NULL, 
 						  0) == NULL){
@@ -378,10 +378,10 @@ void UpdateData(const std::string& object,const std::string& suspect,const std::
 	}
 
 	if(mysql_real_connect(conn, 
-		                  "mysql.comp.polyu.edu.hk", 
-						  "biomet", 
-						  "qwkdjmxn", 
-						  "biomet", 
+		                  "localhost", 
+						  "test", 
+						  "test", 
+						  "test", 
 						  3306, 
 						  NULL, 
 						  0) == NULL){
