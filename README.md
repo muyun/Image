@@ -2,11 +2,9 @@
 
 #### Functions:
      
-* detect the  face using SVM
-     - m_face_detection*
-     
 * PCA and LBPH alg are used to face recognizion
      - eigenfaces*
+     - m_face_detection*
 
 
 * Centroid-based partitioning (Hierarchical Clustering) and multi-probe LSH algorithm examples based on the FLANN library
