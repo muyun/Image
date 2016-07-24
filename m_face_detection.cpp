@@ -250,7 +250,7 @@ int main( int argc, char* argv[] )
 	//char re[256];
 //
 //	//the image dir
-    string dir = "D:\\wenlong\\workspace\\proj\\MaskedfaceDetection\\MaskedfaceDetection\\trainings\\";
+    string dir = "D:\\wenlong\\workspace\\proj\\MfaceDetection\\MfaceDetection\\trainings\\";
 //	//string dir_name = "D:\\wenlong\\workspace\\proj\\FaceLivenessDetection\\FaceLivenessDetection\\forehead\\";
     string files_name = dir + "*_NIR.jpg";
 //
