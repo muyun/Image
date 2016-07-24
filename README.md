@@ -1,5 +1,3 @@
-###An image processing Lib
-
 #### Functions:
      
 * PCA and LBPH alg are used to face recognizion
